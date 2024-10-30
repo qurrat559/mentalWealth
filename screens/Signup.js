@@ -30,7 +30,7 @@ const Signup = ({ navigation }) => {
 
   const handleSignUp = () => {
     axios
-      .post("http://192.168.42.207:3002/signup", {
+      .post("http://192.168.81.53:3002/signup", {
         name: name,
         phoneNumber: phoneNumber,
         password: password,

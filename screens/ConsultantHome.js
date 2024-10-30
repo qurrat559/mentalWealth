@@ -23,6 +23,11 @@ const ConsultantHome = ({ route, navigation }) => {
     navigation.navigate("ConsultantFeedback");
   };
 
+  const handleViewPatient = () => {
+    // Navigate to the Emergency component
+    navigation.navigate("ViewPatient");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -52,7 +57,7 @@ const ConsultantHome = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.box}>
+        <TouchableOpacity style={styles.box} onPress={handleViewPatient}>
           <View style={styles.boxContent}>
             <Ionicons name="people-outline" size={40} color="#007260" />
             <Text style={styles.boxText}>View Patients</Text>

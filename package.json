@@ -19,6 +19,7 @@
     "notistack": "^3.0.1",
     "react": "18.2.0",
     "react-native": "0.73.4",
+    "react-native-element-dropdown": "^2.12.2",
     "react-native-elements": "^3.4.3",
     "react-native-flash-message": "^0.4.2",
     "react-native-picker-select": "^9.1.3",

@@ -7,11 +7,14 @@ import {
   Modal,
   ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { getUserDetails } from "../UserStore";
 
 const Consultantconnect = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [consultant, setConsultant] = useState([]);
+  const user = getUserDetails();
 
   const handleHomePress = () => {
     navigation.navigate("IndividualHome");
@@ -21,33 +24,72 @@ const Consultantconnect = ({ navigation }) => {
     navigation.navigate("IndividualSettings");
   };
 
-  const consultants = [
-    {
-      id: 1,
-      name: "Dr. John Doe",
-      specialty: "Cardiology",
-      clinicAddress: "123 Heartbeat St.",
-      timings: "9 AM - 5 PM",
-      availableDays: "Monday - Friday",
-    },
-    {
-      id: 2,
-      name: "Dr. Jane Smith",
-      specialty: "Neurology",
-      clinicAddress: "456 Brainwave Ave.",
-      timings: "10 AM - 6 PM",
-      availableDays: "Tuesday, Thursday, Saturday",
-    },
-    {
-      id: 3,
-      name: "Dr. Emily Johnson",
-      specialty: "Pediatrics",
-      clinicAddress: "789 Childcare Blvd.",
-      timings: "8 AM - 3 PM",
-      availableDays: "Monday, Wednesday, Friday",
-    },
-    // Add more dummy consultants as needed
-  ];
+  const handleSubmit = async (item) => {
+    try {
+      let form = {
+        individual_id: user.id,
+        consultant_id: item.id,
+      };
+      const response = await fetch(
+        "http://192.168.81.53:3002/individual/book-appointment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("appointment booked successfully:", result);
+        alert("Appointment booked successfully!");
+        navigation.navigate("ConsultantHome");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to book appointment:", errorData);
+        alert(`Failed to book appointment ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Error submitting consultant details:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
+  const fetchConsultantData = async () => {
+    try {
+      const response = await fetch(
+        "http://192.168.81.53:3002/individual/get-consultant",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("resssssssss", response);
+
+      if (response.ok) {
+        const result = await response.json();
+
+        console.log("Form data fetched successfully:", result);
+        setConsultant(result?.data);
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to fetch consultant details:", errorData);
+        alert(`Failed to fetch consultant details: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Error fetching consultant details:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    fetchConsultantData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -105,22 +147,25 @@ const Consultantconnect = ({ navigation }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalHeaderText}>Consultants</Text>
             <ScrollView style={styles.consultantList}>
-              {consultants.map((consultant) => (
+              {consultant.map((consultant) => (
                 <View key={consultant.id} style={styles.consultantItem}>
                   <Text style={styles.consultantName}>{consultant.name}</Text>
                   <Text style={styles.consultantSpecialty}>
-                    {consultant.specialty}
+                    {consultant.specialization}
                   </Text>
                   <Text style={styles.consultantAddress}>
-                    {consultant.clinicAddress}
+                    {consultant.address}
                   </Text>
                   <Text style={styles.consultantTimings}>
-                    Timings: {consultant.timings}
+                    Timings: {consultant.clinic_timing}
                   </Text>
                   <Text style={styles.consultantAvailableDays}>
-                    Available Days: {consultant.availableDays}
+                    Available Day: {consultant.available_days}
                   </Text>
-                  <TouchableOpacity style={styles.bookButton}>
+                  <TouchableOpacity
+                    style={styles.bookButton}
+                    onPress={() => handleSubmit(consultant)}
+                  >
                     <Text style={styles.bookButtonText}>Book Appointment</Text>
                   </TouchableOpacity>
                 </View>
@@ -254,27 +299,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalHeaderText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  consultantList: {
-    width: "100%",
-  },
+
   consultantItem: {
     marginBottom: 15,
     backgroundColor: "#f9f9f9",
@@ -316,15 +341,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    padding: 20,
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 30,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeaderText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#007260",
+  },
   closeButton: {
     marginTop: 20,
-    backgroundColor: "red",
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: "#d9534f",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
   },
   closeButtonText: {
     color: "#fff",
     fontSize: 16,
+    textAlign: "center",
+  },
+  consultantList: {
+    width: "100%",
+    maxHeight: 500,
   },
 });
 

@@ -14,6 +14,11 @@ import Feedback from "./screens/Feedback";
 import ConsultantSettings from "./screens/ConsultantSettings";
 import ConsultantDetailForm from "./screens/ConsultantDetailForm";
 import ConsultantFeedback from "./screens/ConsultantFeedback";
+import ViewPatient from "./screens/ViewPatient";
+import AdminHome from "./screens/AdminHome";
+import AdminSettings from "./screens/AdminSettings";
+import ShowConsultantFeedback from "./screens/ShowConsultantFeedback";
+import IndividualFeedback from "./screens/IndividualFeedback";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +53,14 @@ export default function App() {
         <Stack.Screen
           name="ConsultantHome"
           component={ConsultantHome}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="AdminHome"
+          component={AdminHome}
           options={{
             headerShown: false,
           }}
@@ -119,6 +132,38 @@ export default function App() {
         <Stack.Screen
           name="ConsultantFeedback"
           component={ConsultantFeedback}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="ViewPatient"
+          component={ViewPatient}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="AdminSettings"
+          component={AdminSettings}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="ShowConsultantFeedback"
+          component={ShowConsultantFeedback}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="IndividualFeedback"
+          component={IndividualFeedback}
           options={{
             headerShown: false,
           }}

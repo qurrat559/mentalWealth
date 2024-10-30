@@ -2,13 +2,13 @@ import { StyleSheet, Text, View, TouchableOpacity, Button } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-const ConsultantSettings = ({ navigation, route }) => {
+const AdminSettings = ({ navigation, route }) => {
   const { userDetails } = route.params || {};
 
   console.log(userDetails);
 
   const handleHomePress = () => {
-    navigation.navigate("ConsultantHome");
+    navigation.navigate("AdminHome");
   };
 
   const handleLogoutPress = () => {
@@ -19,7 +19,7 @@ const ConsultantSettings = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.leftBox}>
-          <Text style={styles.leftText}>Consultant</Text>
+          <Text style={styles.leftText}>Admin</Text>
         </View>
         <TouchableOpacity
           style={styles.rightIconContainer}
@@ -160,4 +160,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ConsultantSettings;
+export default AdminSettings;

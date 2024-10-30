@@ -8,21 +8,25 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { getUserDetails } from "../UserStore";
 
 const Emergency = ({ navigation }) => {
   const [emergencyContact, setEmergencyContact] = useState("");
+  const user = getUserDetails();
 
   useEffect(() => {
     // Fetch the emergency contact from the API
     const fetchEmergencyContact = async () => {
       try {
         const response = await fetch(
-          "http://192.168.42.207:3002/api/emergency"
+          `http://192.168.81.53:3002/api/emergency/${user.id}`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
+
         const data = await response.json();
+        console.log("djdkjd", data);
         setEmergencyContact(data.emergencyContact);
       } catch (error) {
         console.error("Error fetching emergency contact:", error);

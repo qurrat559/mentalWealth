@@ -11,6 +11,25 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { Dropdown } from "react-native-element-dropdown";
+
+const availableDays = [
+  { label: "Monday", value: "Monday" },
+  { label: "Tuesday", value: "Tuesday" },
+  { label: "Wednesday", value: "Wednesday" },
+  { label: "Thursday", value: "Thursday" },
+  { label: "Friday", value: "Friday" },
+  { label: "Saturday", value: "Saturday" },
+  { label: "Sunday", value: "Sunday" },
+];
+
+const availableTimings = [
+  { label: "12:00 - 13:00", value: "12:00 - 13:00" },
+  { label: "13:00 - 14:00", value: "13:00 - 14:00" },
+  { label: "14:00 - 15:00", value: "14:00 - 15:00" },
+  { label: "15:00 - 16:00", value: "15:00 - 16:00" },
+  { label: "16:00 - 17:00", value: "16:00 - 17:00" },
+];
 
 const ConsultantDetailForm = ({ route, navigation }) => {
   const { userDetails = {} } = route.params || {};
@@ -18,10 +37,10 @@ const ConsultantDetailForm = ({ route, navigation }) => {
   const [form, setForm] = useState({
     name: userDetails.name || "",
     specialization: "",
-    availableDates: "",
+    availableDays: [],
     consultationFee: "",
     notes: "",
-    clinicTiming: "",
+    clinicTiming: [],
     address: "",
   });
 
@@ -33,7 +52,7 @@ const ConsultantDetailForm = ({ route, navigation }) => {
     if (
       !form.name ||
       !form.specialization ||
-      !form.availableDates ||
+      !form.availableDays ||
       !form.clinicTiming ||
       !form.address ||
       !form.consultationFee
@@ -44,7 +63,7 @@ const ConsultantDetailForm = ({ route, navigation }) => {
 
     try {
       const response = await fetch(
-        "http://192.168.42.207:3002/consultant-detail",
+        "http://192.168.81.53:3002/consultant-detail",
         {
           method: "POST",
           headers: {
@@ -111,28 +130,40 @@ const ConsultantDetailForm = ({ route, navigation }) => {
             placeholder="e.g., General Consultant"
           />
 
-          <Text style={styles.label}>Available Dates</Text>
-          <TextInput
-            style={styles.input}
-            value={form.availableDates}
-            onChangeText={(value) => handleInputChange("availableDates", value)}
-            placeholder="e.g., 2024-09-01, 2024-09-05"
+          <Text style={styles.label}>Available Days</Text>
+          <Dropdown
+            style={styles.dropdown}
+            data={availableDays}
+            labelField="label"
+            valueField="value"
+            placeholder="Select available days"
+            value={form.availableDays}
+            onChange={(item) => handleInputChange("availableDays", item)}
+            multiple={true}
+            search
+            searchPlaceholder="Search..."
           />
 
           <Text style={styles.label}>Timings</Text>
-          <TextInput
-            style={styles.input}
+          <Dropdown
+            style={styles.dropdown}
+            data={availableTimings}
+            labelField="label"
+            valueField="value"
+            placeholder="Select clinic timings"
             value={form.clinicTiming}
-            onChangeText={(value) => handleInputChange("clinicTiming", value)}
-            placeholder="e.g., 3:30 pm - 4:30 pm"
+            onChange={(item) => handleInputChange("clinicTiming", item)}
+            multiple={true}
+            search
+            searchPlaceholder="Search..."
           />
 
           <Text style={styles.label}>Address</Text>
           <TextInput
             style={styles.input}
-            value={form.Address}
+            value={form.address}
             onChangeText={(value) => handleInputChange("address", value)}
-            placeholder="e.g., Robert Robertson, 1234 NW Bobcat Lanes"
+            placeholder="e.g., 1234 NW Bobcat Lanes"
           />
 
           <Text style={styles.label}>Consultation Fee</Text>
@@ -246,6 +277,14 @@ const styles = StyleSheet.create({
     // marginHorizontal: 90,
     // marginBottom: 20,
     // alignItems: "center",
+  },
+
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    marginBottom: 20,
+    padding: 10,
   },
 
   bottomBar: {

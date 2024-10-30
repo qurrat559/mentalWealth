@@ -43,7 +43,7 @@ const SelfQuestions = ({ navigation }) => {
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        "http://192.168.42.207:3002/mental-health-assessment",
+        "http://192.168.81.53:3002/mental-health-assessment",
         {
           method: "POST",
           headers: {

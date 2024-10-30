@@ -67,7 +67,7 @@ const ConsultantFeedback = ({ navigation }) => {
 
     try {
       const response = await axios.post(
-        "http://192.168.42.207:3002/submit-consultant-feedback",
+        "http://192.168.81.53:3002/submit-consultant-feedback",
         feedbackData,
         {
           headers: {

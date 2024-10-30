@@ -17,6 +17,7 @@ import COLORS from "../constants/colors";
 import axios from "axios";
 import Button from "../components/Button";
 import { Picker } from "@react-native-picker/picker";
+import { setUserDetails } from "../UserStore";
 
 const Login = ({ navigation }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -45,7 +46,7 @@ const Login = ({ navigation }) => {
 
     try {
       const response = await axios.post(
-        "http://192.168.42.207:3002/forgot-password",
+        "http://192.168.81.53:3002/forgot-password",
         {
           cnic: cnicNumber,
           petName: petName,
@@ -79,7 +80,7 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://192.168.17.207:3002/login", {
+      const response = await axios.post("http://192.168.81.53:3002/login", {
         cnic: cnicNumber,
         password: password,
         role: userType,
@@ -87,10 +88,12 @@ const Login = ({ navigation }) => {
 
       if (response.data.success) {
         const userDetails = response.data.userDetails;
-
+        setUserDetails(response.data.userDetails);
         // Navigate to the home screen and pass user details
         if (userType === "individual") {
           navigation.navigate("IndividualHome", { userDetails });
+        } else if (userType === "admin") {
+          navigation.navigate("AdminHome", { userDetails });
         } else {
           navigation.navigate("ConsultantHome", { userDetails });
         }
@@ -261,7 +264,8 @@ const Login = ({ navigation }) => {
               style={{ height: "100%", width: "100%" }}
             >
               <Picker.Item label="I am an Individual" value="individual" />
-              <Picker.Item label="I am consultant" value="consultant" />
+              <Picker.Item label="I am Consultant" value="consultant" />
+              <Picker.Item label="I am an Admin" value="admin" />
             </Picker>
           </View>
         </View>

@@ -1,16 +1,23 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   Button,
+  TextInput,
   ActivityIndicator,
+  Modal,
+  Alert,
 } from "react-native";
-import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { getUserDetails } from "../UserStore";
 
 const IndividualSettings = ({ navigation, route }) => {
-  const { userDetails } = route.params || {};
+  const userDetails = getUserDetails();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [emergencyContact, setEmergencyContact] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleHomePress = () => {
     navigation.navigate("IndividualHome");
@@ -18,6 +25,39 @@ const IndividualSettings = ({ navigation, route }) => {
 
   const handleLogoutPress = () => {
     navigation.navigate("Login");
+  };
+
+  const handleUpdateEmergencyContact = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        "http://192.168.81.53:3002/individual/update-emergency-contact",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: userDetails?.id,
+            emergency_contact: emergencyContact,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Success", "Emergency contact updated successfully!");
+      } else {
+        Alert.alert("Error", result.message || "Failed to update contact.");
+      }
+    } catch (error) {
+      console.error("Error updating emergency contact:", error);
+      Alert.alert("Error", "An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setModalVisible(false);
+    }
   };
 
   return (
@@ -50,8 +90,54 @@ const IndividualSettings = ({ navigation, route }) => {
           <Text>No user details available</Text>
         )}
 
-        <Button title="LOGOUT" onPress={handleLogoutPress} />
+        <View style={{ flexDirection: "column", alignSelf: "center" }}>
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.updateButtonText}>
+              Update Emergency Contact
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={handleLogoutPress}
+          >
+            <Text style={styles.updateButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* <Button title="LOGOUT"  /> */}
       </View>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalHeading}>Enter New Emergency Contact</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              placeholder="Enter contact number"
+              value={emergencyContact}
+              onChangeText={setEmergencyContact}
+            />
+            <View style={styles.modalButtons}>
+              <Button title="Cancel" onPress={() => setModalVisible(false)} />
+              <Button
+                title={loading ? "Updating..." : "Update"}
+                onPress={handleUpdateEmergencyContact}
+                disabled={loading || !emergencyContact}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.bottomBar}>
         <TouchableOpacity
@@ -79,15 +165,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
     backgroundColor: "#007260",
     elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    borderRadius: 14,
     marginTop: 40,
   },
   leftBox: {
@@ -101,16 +180,11 @@ const styles = StyleSheet.create({
   },
   rightIconContainer: {
     padding: 5,
-    borderRadius: 15,
   },
-
   content: {
     flex: 1,
     padding: 20,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
   },
-
   sectionHeading: {
     fontSize: 24,
     fontWeight: "bold",
@@ -123,25 +197,60 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
   },
+  updateButton: {
+    backgroundColor: "#007260",
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: "center",
+  },
+  updateButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  modalHeading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   bottomBar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    alignItems: "center",
     paddingVertical: 20,
     backgroundColor: "#007260",
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    borderRadius: 14,
-    marginBottom: 20,
   },
   bottomBarItem: {
     alignItems: "center",
-  },
-  bottomBarText: {
-    color: "#fff",
-    marginTop: 4,
   },
 });
 
